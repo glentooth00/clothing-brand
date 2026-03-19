@@ -13,6 +13,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showAdminLogin()
+    {
+        return view('admin.auth.login');
+    }
+
     // Handle login submission
     public function login(Request $request)
     {
@@ -29,5 +34,25 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'Invalid credentials.',
         ]);
+    }
+
+    public function adminLogin(Request $request)
+    {
+            $credentials = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
+
+            if (Auth::guard('admin')->attempt($credentials)) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return back()->with('error', 'Invalid credentials');
+    }
+
+    public function logout()
+    {
+        Auth::guard('admin')->logout();
+        return redirect()->route('admin.login');
     }
 }
